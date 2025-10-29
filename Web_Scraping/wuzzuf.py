@@ -20,9 +20,9 @@ requirements_list = []
 links = []  
 
 title = soup.find_all("h2", class_="css-193uk2c") 
-company = soup.find_all("a", class_="css-ipsyv7") 
+company = soup.find_all("a", class_="css-o171kl") 
 location = soup.find_all("span", class_="css-16x61xq") 
-type = soup.find_all("span", class_="eoyjyou0") 
+type = soup.find_all("span", class_="css-uc9rga") 
 posted_in = soup.find_all("div", class_="css-eg55jf")
 
 for details in range(len(title)):
@@ -38,16 +38,18 @@ for link in links:
     job_soup = bs(job_response.content, 'html.parser')
 
 
-    exp = job_soup.find("span", {"class": "css-47jx3m"})
-    experience_levels.append(exp.text.strip() if exp else "Not specified")
+    experience = job_soup.find("span", class_="css-2rozun")
+    # find the <ul>
+    requirements = job_soup.find("div", class_="css-1lqavbg")
+    
 
-    reqs = job_soup.find("div", {"class": "css-1t5f0fr"}) 
-    if reqs:
-        req_items = reqs.find_all("li")
-        requirements_text = " | ".join([item.text.strip() for item in req_items])
-    else:
-        requirements_text = "Not specified"
-    requirements_list.append(requirements_text)
+    # find all <li> items inside it
+    lis = requirements.find_all("li")
+
+    requirements_list.append([li.get_text(strip=True) for li in lis])
+
+    experience_levels.append(experience.get_text(strip=True) if experience else "Not specified")
+
 
     time.sleep(2)
 
@@ -64,4 +66,4 @@ with open('wuzzuf_scraping.csv','w') as file:
             job_types[i], experience_levels[i], posting_dates[i],
             requirements_list[i], links[i]
         ])
-print("Data saved to wuzzuf_engineering_jobs.csv")
+print("Data saved to wuzzuf_scraping.csv")
